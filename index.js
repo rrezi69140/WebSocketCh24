@@ -13,6 +13,15 @@ const io = socketIo(server, {
 
 const connectedUsers = new Map();
 
+// Historique des messages par zone
+const messageHistory = {
+    zone1: [],
+    zone2: [],
+    zone3: [],
+    ALL: []
+};
+
+
 class User {
     constructor(UserId, username = "Anonymous", Zone = "ALL") {
         this.userid = UserId;
@@ -29,9 +38,24 @@ io.on('connection', (socket) => {
     io.emit('connectedUsers', Array.from(connectedUsers.values()));
 
     socket.on('message', (data) => {
+        const zone = data.zone || 'ALL';
+
+        // Stocker le message
+        if (!messageHistory[zone]) {
+            messageHistory[zone] = [];
+        }
+
+        messageHistory[zone].push(data);
+
+        // Émettre à tous les clients
         io.emit('message', data);
     });
 
+
+    socket.on('getMessages', (zone) => {
+        const messages = messageHistory[zone] || [];
+        socket.emit('messageHistory', messages);
+    });
 
 
 
