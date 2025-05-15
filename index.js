@@ -28,10 +28,9 @@ io.on('connection', (socket) => {
     connectedUsers.set(socket.id, newUser);
     io.emit('connectedUsers', Array.from(connectedUsers.values()));
 
-    socket.on('message', (message) => {
-        io.emit('message', message);
+    socket.on('message', (data) => {
+        io.emit('message', data);
     });
-
 
 
 
